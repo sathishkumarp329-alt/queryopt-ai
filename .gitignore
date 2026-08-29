@@ -1,0 +1,54 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+.venv/
+*.egg-info/
+dist/
+build/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Databases
+database/demo.db
+database/app.db
+*.db
+*.sqlite3
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Node
+node_modules/
+frontend/dist/
+frontend/.vite/
+
+# Logs
+*.log
+logs/
+
+# Test artifacts
+.pytest_cache/
+.coverage
+htmlcov/
+coverage.xml
+
+# Reports and trajectories (user-generated)
+trajectories/*.json
+reports/*.json
+reports/*.html
+
+# Evaluation results (generated, not committed)
+evaluation/results_baseline.json
+evaluation/results_agentic.json
+evaluation/metrics.json

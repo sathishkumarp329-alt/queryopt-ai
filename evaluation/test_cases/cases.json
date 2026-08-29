@@ -1,0 +1,182 @@
+[
+  {
+    "id": "TC001",
+    "name": "SELECT * on Wide Table",
+    "sql": "SELECT * FROM customers;",
+    "category": "Column Selection",
+    "expected_problems": ["Unnecessary SELECT *", "Missing WHERE Filter"],
+    "expected_indexes": [],
+    "should_optimize": true
+  },
+  {
+    "id": "TC002",
+    "name": "Unbounded Orders Scan",
+    "sql": "SELECT order_id, total_amount FROM orders;",
+    "category": "Filtering",
+    "expected_problems": ["Missing WHERE Filter"],
+    "expected_indexes": [],
+    "should_optimize": false
+  },
+  {
+    "id": "TC003",
+    "name": "Non-Sargable YEAR() Function Filter",
+    "sql": "SELECT * FROM orders WHERE strftime('%Y', order_date) = '2024';",
+    "category": "SARGability",
+    "expected_problems": ["Unnecessary SELECT *", "Non-Sargable Function"],
+    "expected_indexes": ["orders.order_date"],
+    "should_optimize": true
+  },
+  {
+    "id": "TC004",
+    "name": "Filter on Unindexed Column (shipping_city)",
+    "sql": "SELECT order_id, total_amount FROM orders WHERE shipping_city = 'Chicago';",
+    "category": "Indexing",
+    "expected_problems": ["Full Table Scan"],
+    "expected_indexes": ["orders.shipping_city"],
+    "should_optimize": true
+  },
+  {
+    "id": "TC005",
+    "name": "Leading Wildcard in LIKE Condition",
+    "sql": "SELECT customer_id, first_name, email FROM customers WHERE email LIKE '%@example.com';",
+    "category": "Pattern Matching",
+    "expected_problems": ["Leading Wildcard"],
+    "expected_indexes": [],
+    "should_optimize": false
+  },
+  {
+    "id": "TC006",
+    "name": "Redundant DISTINCT with GROUP BY",
+    "sql": "SELECT DISTINCT status, COUNT(*) FROM orders GROUP BY status;",
+    "category": "Redundancy",
+    "expected_problems": ["Redundant DISTINCT"],
+    "expected_indexes": [],
+    "should_optimize": true
+  },
+  {
+    "id": "TC007",
+    "name": "Cartesian Product Missing Join Condition",
+    "sql": "SELECT customers.first_name, orders.order_id FROM customers, orders;",
+    "category": "Joins",
+    "expected_problems": ["Cartesian Product"],
+    "expected_indexes": [],
+    "should_optimize": true
+  },
+  {
+    "id": "TC008",
+    "name": "Unbounded ORDER BY on Large Table",
+    "sql": "SELECT order_id, total_amount FROM orders ORDER BY total_amount DESC;",
+    "category": "Sorting",
+    "expected_problems": ["Unbounded Sorting"],
+    "expected_indexes": ["orders.total_amount"],
+    "should_optimize": true
+  },
+  {
+    "id": "TC009",
+    "name": "Multiple OR Equality Predicates",
+    "sql": "SELECT product_id, name, price FROM products WHERE category = 'Electronics' OR category = 'Books' OR category = 'Clothing';",
+    "category": "Predicate Optimization",
+    "expected_problems": [],
+    "expected_indexes": ["products.category"],
+    "should_optimize": true
+  },
+  {
+    "id": "TC010",
+    "name": "Join with Indexed Customer ID (Good Query)",
+    "sql": "SELECT o.order_id, o.order_date, c.first_name, c.email FROM orders o JOIN customers c ON o.customer_id = c.customer_id WHERE o.customer_id = 42;",
+    "category": "Optimal",
+    "expected_problems": [],
+    "expected_indexes": [],
+    "should_optimize": false
+  },
+  {
+    "id": "TC011",
+    "name": "Filter on Unindexed Salary in Employees",
+    "sql": "SELECT employee_id, first_name, salary FROM employees WHERE salary > 120000;",
+    "category": "Indexing",
+    "expected_problems": ["Full Table Scan"],
+    "expected_indexes": ["employees.salary"],
+    "should_optimize": true
+  },
+  {
+    "id": "TC012",
+    "name": "Composite Index Opportunity (status + order_date)",
+    "sql": "SELECT order_id, customer_id, total_amount FROM orders WHERE status = 'delivered' ORDER BY order_date DESC LIMIT 50;",
+    "category": "Composite Index",
+    "expected_problems": [],
+    "expected_indexes": ["orders.status_order_date"],
+    "should_optimize": true
+  },
+  {
+    "id": "TC013",
+    "name": "SELECT * with Multi-Table Joins",
+    "sql": "SELECT * FROM orders o JOIN order_items oi ON o.order_id = oi.order_id JOIN products p ON oi.product_id = p.product_id WHERE o.order_id = 100;",
+    "category": "Multi-Join Projection",
+    "expected_problems": ["Unnecessary SELECT *"],
+    "expected_indexes": [],
+    "should_optimize": true
+  },
+  {
+    "id": "TC014",
+    "name": "Already Optimal Filtered Aggregation",
+    "sql": "SELECT status, COUNT(*), SUM(total_amount) FROM orders WHERE order_date >= '2024-01-01' GROUP BY status;",
+    "category": "Optimal Aggregation",
+    "expected_problems": [],
+    "expected_indexes": [],
+    "should_optimize": false
+  },
+  {
+    "id": "TC015",
+    "name": "Non-Sargable strftime on Created Date",
+    "sql": "SELECT customer_id, first_name, email FROM customers WHERE strftime('%Y', created_at) = '2023';",
+    "category": "SARGability",
+    "expected_problems": ["Non-Sargable Function"],
+    "expected_indexes": ["customers.created_at"],
+    "should_optimize": true
+  },
+  {
+    "id": "TC016",
+    "name": "Full Scan on Products Stock Filter",
+    "sql": "SELECT product_id, name, stock_quantity FROM products WHERE stock_quantity < 10;",
+    "category": "Indexing",
+    "expected_problems": ["Full Table Scan"],
+    "expected_indexes": ["products.stock_quantity"],
+    "should_optimize": true
+  },
+  {
+    "id": "TC017",
+    "name": "Multi-Join on Department Location",
+    "sql": "SELECT e.first_name, e.last_name, d.name, d.location FROM employees e JOIN departments d ON e.department_id = d.department_id WHERE d.location = 'Building A, Floor 3';",
+    "category": "Joins",
+    "expected_problems": [],
+    "expected_indexes": ["departments.location"],
+    "should_optimize": true
+  },
+  {
+    "id": "TC018",
+    "name": "Correlated Order Items Aggregation",
+    "sql": "SELECT o.order_id, o.total_amount, (SELECT COUNT(*) FROM order_items oi WHERE oi.order_id = o.order_id) as item_count FROM orders o WHERE o.customer_id = 10;",
+    "category": "Subquery",
+    "expected_problems": [],
+    "expected_indexes": [],
+    "should_optimize": false
+  },
+  {
+    "id": "TC019",
+    "name": "Filter on Unindexed Country in Suppliers",
+    "sql": "SELECT supplier_id, name, contact_email FROM suppliers WHERE country = 'Germany';",
+    "category": "Indexing",
+    "expected_problems": ["Full Table Scan"],
+    "expected_indexes": ["suppliers.country"],
+    "should_optimize": true
+  },
+  {
+    "id": "TC020",
+    "name": "Complex Multi-Issue Query (SELECT *, Wildcard, Sort)",
+    "sql": "SELECT * FROM customers WHERE email LIKE '%@gmail.com' ORDER BY city;",
+    "category": "Compound Antipatterns",
+    "expected_problems": ["Unnecessary SELECT *", "Leading Wildcard", "Unbounded Sorting"],
+    "expected_indexes": [],
+    "should_optimize": true
+  }
+]

@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./database:/app/database
+      - ./trajectories:/app/trajectories
+      - ./reports:/app/reports
+    environment:
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-}
+      - DEMO_DB_PATH=/app/database/demo.db
+      - APP_DB_PATH=/app/database/app.db
+      - CORS_ORIGINS=http://localhost:5173,http://localhost:3000
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.frontend
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  db_data:

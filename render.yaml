@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: queryopt-ai
+    runtime: docker
+    plan: free
+    region: oregon
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: MAX_QUERY_ROWS
+        value: "1000"
+      - key: QUERY_TIMEOUT_SECONDS
+        value: "10"
+      - key: LOG_LEVEL
+        value: "INFO"
+    healthCheckPath: /api/health
