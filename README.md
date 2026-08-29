@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # QueryOpt AI — Agentic SQL Query Analysis & Optimization Assistant
 
 > **Hackathon Project** · Agentic Workflows Track
@@ -247,3 +248,7 @@ The baseline uses 15+ deterministic rules without any LLM. The agentic system ad
 ## 📄 License
 
 MIT — Built for Agentic Workflows Hackathon.
+=======
+# queryopt-ai
+Agentic SQL Query Analysis &amp; Optimization Assistant
+>>>>>>> 118f2cd8cb141261ec2fb78272601b96dcf00b20
