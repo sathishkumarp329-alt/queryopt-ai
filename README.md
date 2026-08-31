@@ -1,7 +1,7 @@
 <<<<<<< HEAD
 # QueryOpt AI — Agentic SQL Query Analysis & Optimization Assistant
 
-> **Hackathon Project** · Agentic Workflows Track
+> Agentic Workflows Track
 
 QueryOpt AI uses a **pipeline of 6 specialized AI agents** to analyze SQL queries, identify performance and correctness problems, generate optimized SQL, verify correctness, and produce evidence-based reports.
 
